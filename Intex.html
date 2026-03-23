@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Dino Jump</title>
+    <style>
+        body { text-align: center; font-family: 'Arial', sans-serif; margin: 0; padding-top: 20px; background-color: #f0f0f0; overflow: hidden; touch-action: manipulation; }
+        .score-board { font-size: 22px; font-weight: bold; margin-bottom: 10px; color: #333; }
+        canvas { border: 4px solid #2c3e50; background: #87CEEB; border-radius: 15px; box-shadow: 0px 10px 25px rgba(0,0,0,0.3); max-width: 95%; height: auto; }
+        p { color: #666; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="score-board">
+        Score: <span id="scoreVal">0</span> | Best: <span id="highScoreVal">0</span>
+    </div>
+    
+    <canvas id="gameCanvas" width="320" height="200"></canvas>
+    
+    <p>Tap to Jump!</p>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreDisplay = document.getElementById("scoreVal");
+        const highScoreDisplay = document.getElementById("highScoreVal");
+
+        // Game Variables
+        let x, y, dy, isJumping, score, obsX, obsY, obsSpeed, clouds, gameState;
+        const START = 0, PLAY = 1, OVER = 2;
+
+        function resetGame() {
+            x = 40; 
+            y = 150; 
+            dy = 0; 
+            isJumping = false; 
+            score = 0;
+            scoreDisplay.innerText = score;
+            obsX = 350; 
+            obsY = 155; 
+            obsSpeed = 3.5;
+            gameState = START;
+            clouds = [
+                {x: 50, y: 30, s: 0.5}, 
+                {x: 200, y: 60, s: 0.3}, 
+                {x: 350, y: 40, s: 0.4}
+            ];
+            highScoreDisplay.innerText = localStorage.getItem("highScore") || 0;
+        }
+
+        function drawDino(px, py) {
+            // Main Body
+            ctx.fillStyle = "#2ecc71"; 
+            ctx.fillRect(px, py, 20, 20);
+            // Eye
+            ctx.fillStyle = "black";
+            ctx.fillRect(px + 14, py + 4, 3, 3);
+            // Back Spikes
+            ctx.fillStyle = "#27ae60";
+            ctx.fillRect(px - 4, py + 4, 4, 12);
+            // Feet
+            ctx.fillStyle = "#333";
+            ctx.fillRect(px + 2, py + 20, 5, 2);
+            ctx.fillRect(px + 12, py + 20, 5, 2);
+        }
+
+        function draw() {
+            // Clear and Draw Sky
+            ctx.fillStyle = "#87CEEB";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Clouds
+            ctx.fillStyle = "white";
+            clouds.forEach(c => {
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, 10, 0, Math.PI * 2);
+                ctx.arc(c.x + 8, c.y - 5, 10, 0, Math.PI * 2);
+                ctx.arc(c.x + 15, c.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+                if (gameState === PLAY || gameState === START) {
+                    c.x -= c.s;
+                    if (c.x < -30) c.x = 350;
+                }
+            });
+
+            // Draw Ground
+            ctx.fillStyle = "#795548"; // Dirt
+            ctx.fillRect(0, 170, canvas.width, 30);
+            ctx.fillStyle = "#4CAF50"; // Grass layer
+            ctx.fillRect(0, 170, canvas.width, 5);
+
+            if (gameState === START) {
+                drawDino(x, y);
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fillRect(40, 70, 240, 60);
+                ctx.fillStyle = "white";
+                ctx.font = "bold 18px Arial";
+                ctx.fillText("TAP TO START", 95, 105);
+            } 
+            
+            else if (gameState === PLAY) {
+                drawDino(x, y);
+
+                // Draw Obstacle (Cactus)
+                ctx.fillStyle = "#1b5e20";
+                ctx.fillRect(obsX, obsY, 15, 25); // Main stem
+                ctx.fillRect(obsX - 5, obsY + 5, 5, 10); // Arm 1
+                ctx.fillRect(obsX + 15, obsY + 8, 5, 10); // Arm 2
+                
+                // Obstacle Movement
+                obsX -= obsSpeed;
+                if (obsX < -25) {
+                    obsX = 350;
+                    score++;
+                    scoreDisplay.innerText = score;
+                    obsSpeed += 0.12; 
+                }
+
+                // Jump Logic
+                if (isJumping) {
+                    y += dy;
+                    dy += 0.6; // Gravity
+                    if (y >= 150) {
+                        y = 150;
+                        isJumping = false;
+                    }
+                }
+
+                // Collision Detection
+                if (x < obsX + 15 && x + 20 > obsX && y < obsY + 25 && y + 20 > obsY) {
+                    const best = localStorage.getItem("highScore") || 0;
+                    if (score > best) {
+                        localStorage.setItem("highScore", score);
+                        highScoreDisplay.innerText = score;
+                    }
+                    gameState = OVER;
+                }
+            } 
+            
+            else if (gameState === OVER) {
+                drawDino(x, y);
+                ctx.fillStyle = "rgba(0,0,0,0.7)";
+                ctx.fillRect(40, 65, 240, 70);
+                ctx.fillStyle = "white";
+                ctx.font = "bold 20px Arial";
+                ctx.fillText("GAME OVER", 105, 95);
+                ctx.font = "14px Arial";
+                ctx.fillText("Tap to Restart", 115, 120);
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        // Handle Touch/Click
+        window.addEventListener("touchstart", function(e) {
+            e.preventDefault();
+            if (gameState === START) {
+                gameState = PLAY;
+            } else if (gameState === PLAY && !isJumping) {
+                dy = -9.5; 
+                isJumping = true;
+            } else if (gameState === OVER) {
+                resetGame();
+            }
+        }, { passive: false });
+
+        // Initialize Game
+        resetGame();
+        draw();
+    </script>
+</body>
+</html>
