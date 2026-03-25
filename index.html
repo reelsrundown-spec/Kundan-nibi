@@ -5,14 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dino Jump Pro</title>
     
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#87CEEB">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <style>
         body { text-align: center; font-family: Arial; margin: 0; padding-top: 20px; background-color: #f0f0f0; overflow: hidden; touch-action: manipulation; -webkit-user-select: none; }
-        .score-board { font-size: 22px; font-weight: bold; margin-bottom: 10px; color: #333; }
+        .score-board { font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #333; }
         canvas { border: 4px solid #2c3e50; background: #87CEEB; border-radius: 15px; box-shadow: 0px 10px 25px rgba(0,0,0,0.3); max-width: 95%; height: auto; }
         p { color: #666; font-weight: bold; }
     </style>
@@ -24,23 +19,26 @@
     <p>Tap to Jump!</p>
 
     <script>
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         const scoreDisplay = document.getElementById("scoreVal");
         const highScoreDisplay = document.getElementById("highScoreVal");
 
-        let x, y, dy, isJumping, score, obsX, obsY, obsSpeed, clouds, gameState;
+        let x, y, dy, isJumping, score, coins, obsX, obsY, obsSpeed, clouds, gameState;
+        let coinX, coinY, coinActive;
         const START = 0, PLAY = 1, OVER = 2;
 
         function resetGame() {
-            x = 40; y = 150; dy = 0; isJumping = false; score = 0;
+            x = 40; y = 150; dy = 0; isJumping = false; 
+            score = 0; coins = 0;
             scoreDisplay.innerText = score;
-            obsX = 350; obsY = 155; obsSpeed = 3.5;
+            obsX = 400; obsY = 155; obsSpeed = 3.5;
+            
+            // Coins screen-il idayil idayil varanulla initial setup
+            coinX = 250; 
+            coinY = 130; 
+            coinActive = true; 
+            
             gameState = START;
             clouds = [{x: 50, y: 30, s: 0.5}, {x: 200, y: 60, s: 0.3}, {x: 350, y: 40, s: 0.4}];
             highScoreDisplay.innerText = localStorage.getItem("highScore") || 0;
@@ -54,12 +52,19 @@
 
         function draw() {
             ctx.fillStyle = "#87CEEB"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
             ctx.fillStyle = "white"; clouds.forEach(c => {
                 ctx.beginPath(); ctx.arc(c.x, c.y, 10, 0, Math.PI * 2); ctx.fill();
                 if (gameState !== OVER) { c.x -= c.s; if (c.x < -30) c.x = 350; }
             });
+
             ctx.fillStyle = "#795548"; ctx.fillRect(0, 170, canvas.width, 30);
             ctx.fillStyle = "#4CAF50"; ctx.fillRect(0, 170, canvas.width, 5);
+
+            // Coin Text and UI
+            ctx.fillStyle = "#FFD700";
+            ctx.font = "bold 15px Arial";
+            ctx.fillText("Coins: " + coins, 230, 25);
 
             if (gameState === START) {
                 drawDino(x, y);
@@ -67,17 +72,57 @@
                 ctx.fillStyle = "white"; ctx.font = "bold 18px Arial"; ctx.fillText("TAP TO START", 95, 105);
             } else if (gameState === PLAY) {
                 drawDino(x, y);
+
+                // Obstacle Logic
                 ctx.fillStyle = "#1b5e20"; ctx.fillRect(obsX, obsY, 15, 25);
-                obsX -= obsSpeed; if (obsX < -25) { obsX = 350; score++; scoreDisplay.innerText = score; obsSpeed += 0.12; }
+                obsX -= obsSpeed; 
+                if (obsX < -25) { 
+                    obsX = 350 + Math.random() * 100; 
+                    score++; 
+                    scoreDisplay.innerText = score; 
+                    obsSpeed += 0.08; 
+                }
+
+                // Continuous Coin Logic
+                if (coinActive) {
+                    ctx.fillStyle = "#FFD700";
+                    ctx.beginPath();
+                    ctx.arc(coinX, coinY, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = "#B8860B";
+                    ctx.stroke();
+                    coinX -= obsSpeed; // Obstacle-inte athe speed-il coin varum
+                    
+                    // Collision with Coin
+                    if (x < coinX + 8 && x + 20 > coinX - 8 && y < coinY + 8 && y + 20 > coinY - 8) {
+                        coins++;
+                        score += 10; // 10 points per coin
+                        scoreDisplay.innerText = score;
+                        coinActive = false; // Collect ചെയ്താൽ അപ്രത്യക്ഷമാകും
+                    }
+                }
+                
+                // കോയിൻ പോയിക്കഴിഞ്ഞാൽ അല്ലെങ്കിൽ സ്ക്രീനിന് പുറത്തായാൽ പെട്ടെന്ന് അടുത്തത് വരാൻ
+                if (coinX < -20 || !coinActive) {
+                    coinX = obsX + 150 + Math.random() * 200; // Obstacle-ൽ നിന്ന് നിശ്ചിത ദൂരത്തിൽ അടുത്ത കോയിൻ
+                    coinY = 100 + Math.random() * 50; 
+                    coinActive = true;
+                }
+
                 if (isJumping) { y += dy; dy += 0.6; if (y >= 150) { y = 150; isJumping = false; } }
+                
                 if (x < obsX + 15 && x + 20 > obsX && y < obsY + 25 && y + 20 > obsY) {
-                    if (score > (localStorage.getItem("highScore") || 0)) localStorage.setItem("highScore", score);
+                    if (score > (parseInt(localStorage.getItem("highScore")) || 0)) {
+                        localStorage.setItem("highScore", score);
+                    }
                     gameState = OVER;
                 }
             } else if (gameState === OVER) {
                 drawDino(x, y);
                 ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(40, 65, 240, 70);
-                ctx.fillStyle = "white"; ctx.font = "bold 20px Arial"; ctx.fillText("GAME OVER", 105, 95);
+                ctx.fillStyle = "white"; 
+                ctx.font = "bold 25px Arial"; 
+                ctx.fillText("നീ ചത്തു", 110, 105); 
             }
             requestAnimationFrame(draw);
         }
