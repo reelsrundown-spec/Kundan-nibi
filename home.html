@@ -8,8 +8,8 @@
         body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; }
         h1 { color: #00d2ff; margin-top: 50px; text-transform: uppercase; }
         p { color: #aaa; margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 400px; margin: 0 auto; }
-        .card { background: #1e1e1e; padding: 25px; border-radius: 20px; text-decoration: none; color: white; border: 2px solid #333; transition: 0.3s; display: flex; flex-direction: column; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 500px; margin: auto; }
+        .card { background: #1e1e1e; padding: 25px; border-radius: 20px; text-decoration: none; color: white; transition: 0.3s; border: 1px solid #333; }
         .card:active { transform: scale(0.95); background: #333; }
         .icon { font-size: 50px; margin-bottom: 10px; }
         .title { font-weight: bold; }
@@ -21,33 +21,28 @@
     <p>Select a Game to Play</p>
 
     <div class="grid">
-        <a href="dino.html" class="card">
-            <div class="icon">🦖</div>
-            <div class="title">Dino Jump</div>
-        </a>
-        <a href="snake.html" class="card">
-            <div class="icon">🐍</div>
-            <div class="title">Snake</div>
-        </a>
-        <a href="bingo.html" class="card">
-            <div class="icon">🔢</div>
-            <div class="title">Bingo</div>
-        </a>
-        <a href="chain.html" class="card">
-            <div class="icon">⚛️</div>
-            <div class="title">Chain Reaction</div>
-        </a>
-        <a href="brick.html" class="card">
-            <div class="icon">🎾</div>
-            <div class="title">Brick Ball</div>
-        </a>
-            <a href="doodle.html" class="card">
-        <div class="icon">🚀</div>
-        <div class="title">Doodle Jump</div>
-           
-        </a>
-        
+        <a href="dino.html" class="card"><div class="icon">🦖</div><div class="title">Dino Jump</div></a>
+        <a href="snake.html" class="card"><div class="icon">🐍</div><div class="title">Snake</div></a>
+        <a href="bingo.html" class="card"><div class="icon">🔢</div><div class="title">Bingo</div></a>
+        <a href="chain.html" class="card"><div class="icon">⚛️</div><div class="title">Chain Reaction</div></a>
+        <a href="brick.html" class="card"><div class="icon">🎾</div><div class="title">Brick Ball</div></a>
+        <a href="doodle.html" class="card"><div class="icon">🚀</div><div class="title">Doodle Jump</div></a>
     </div>
 
+    <script>
+        // Music setup
+        const bgMusic = new Audio('bgm.mp3');
+        bgMusic.loop = true;
+
+        // Try to play music automatically
+        if (localStorage.getItem('musicPref') !== 'off') {
+            bgMusic.play().catch(e => {
+                console.log("Autoplay blocked. Tap anywhere to play.");
+                document.addEventListener('click', () => {
+                    bgMusic.play();
+                }, { once: true });
+            });
+        }
+    </script>
 </body>
 </html>
