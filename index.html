@@ -89,8 +89,7 @@
         // Music setup
         const bgMusic = new Audio('bgm.mp3');
         bgMusic.loop = true;
-        let musicEnabled = true;
-
+        const bgMusic = new Audio('./bgm.mp3');
         // Load saved preference if any
         if(localStorage.getItem('musicPref') === 'off') {
             musicEnabled = false;
