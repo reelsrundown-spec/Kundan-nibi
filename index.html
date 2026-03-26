@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #121212; /* Dark background */
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { 
+            color: #00d2ff; 
+            margin-top: 50px; 
+            font-size: 2rem;
+            text-transform: uppercase;
+        }
+        p {
+            color: #aaa;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns like screenshot */
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: white;
+            border: 2px solid #333;
+            transition: 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .card:active { transform: scale(0.95); background: #333; }
+        
+        .icon { font-size: 50px; margin-bottom: 15px; }
+        .title { font-weight: bold; font-size: 1rem; }
+        
+        .locked { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
+        .soon { color: #888; font-size: 0.9rem; margin-top: 3px;}
+    </style>
+</head>
+<body>
+
+    <h1>MY GAME HUB</h1>
+    <p>Select a Game to Play</p>
+
+    <div class="grid">
+        <a href="dino.html" class="card">
+            <div class="icon">🦖</div>
+            <div class="title">Dino Jump</div>
+        </a>
+
+        <div class="card locked">
+            <div class="icon">🐍</div>
+            <div class="title">Snake</div>
+            <div class="soon">(Soon)</div>
+        </div>
+
+        <div class="card locked">
+            <div class="icon">🧱</div>
+            <div class="title">Tetris</div>
+            <div class="soon">(Soon)</div>
+        </div>
+    </div>
+
+</body>
+</html>
