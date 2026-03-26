@@ -28,6 +28,10 @@
         const ctx = canvas.getContext("2d");
         const scoreDisplay = document.getElementById("scoreVal");
 
+        // Sound Effects
+        const jumpSound = new Audio('jump.mp3');
+        const coinSound = new Audio('coin.mp3');
+
         let x, y, dy, isJumping, score, coins, obsX, obsY, obsSpeed, clouds, gameState;
         let coinX, coinY, coinActive;
         const START = 0, PLAY = 1, OVER = 2;
@@ -74,6 +78,7 @@
                     ctx.fillStyle = "#FFD700"; ctx.beginPath(); ctx.arc(coinX, coinY, 8, 0, Math.PI * 2); ctx.fill();
                     coinX -= obsSpeed;
                     if (x < coinX + 8 && x + 20 > coinX - 8 && y < coinY + 8 && y + 20 > coinY - 8) {
+                        coinSound.play(); // Play coin sound
                         coins++; score += 10; scoreDisplay.innerText = score; coinActive = false;
                     }
                 }
@@ -85,7 +90,7 @@
                 drawDino(x, y);
                 ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(40, 65, 240, 70);
                 ctx.fillStyle = "white"; ctx.font = "bold 25px Arial"; 
-                ctx.fillText("\u0D28\u0D40 \u0D1A\u0D24\u0D4D\u0D24\u0D41", 110, 105); 
+                ctx.fillText("GAME OVER", 95, 105); 
             }
             requestAnimationFrame(draw);
         }
@@ -94,11 +99,14 @@
             if (e.target.tagName === 'A') return;
             e.preventDefault();
             if (gameState === START) gameState = PLAY;
-            else if (gameState === PLAY && !isJumping) { dy = -9.5; isJumping = true; }
+            else if (gameState === PLAY && !isJumping) { 
+                dy = -9.5; 
+                isJumping = true; 
+                jumpSound.play(); // Play jump sound
+            }
             else if (gameState === OVER) resetGame();
         }, { passive: false });
 
-        // IMPORTANT: Start the game engine
         resetGame(); 
         draw(); 
 
