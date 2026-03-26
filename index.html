@@ -24,6 +24,7 @@
             box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
             transition: 0.3s;
             text-align: center;
+            cursor: pointer;
         }
         .welcome-box:active { transform: scale(0.9); }
         .welcome-box h2 {
@@ -35,7 +36,6 @@
         }
         .footer-text { color: #555; margin-top: 15px; position: absolute; bottom: 50px; }
 
-        /* Settings Style */
         .settings-btn {
             position: absolute; top: 20px; right: 20px;
             background: none; border: none; cursor: pointer; font-size: 30px;
@@ -51,12 +51,13 @@
             border: 2px solid #00d2ff; text-align: center; width: 250px;
         }
         .toggle-btn {
-            background: #00d2ff; border: none; padding: 8px 15px;
-            border-radius: 5px; font-weight: bold; cursor: pointer; min-width: 60px;
+            background: #4CAF50; border: none; padding: 10px 20px;
+            border-radius: 5px; font-weight: bold; cursor: pointer; min-width: 80px;
+            color: white;
         }
         .close-btn {
             background: none; border: 1px solid white; color: white; 
-            padding: 5px 15px; border-radius: 5px; cursor: pointer; margin-top: 15px;
+            padding: 8px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px;
         }
     </style>
 </head>
@@ -64,18 +65,18 @@
 
     <button class="settings-btn" onclick="openSettings()">⚙️</button>
 
-    <a href="home.html" class="welcome-box">
+    <div class="welcome-box" onclick="startExperience()">
         <h2>ALL GAMES</h2>
-    </a>
+    </div>
 
     <p class="footer-text">Tap the box to start</p>
 
     <div id="settingsMenu">
         <div class="menu-content">
             <h2 style="color:#00d2ff">SETTINGS</h2>
-            <div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="margin: 30px 0; display: flex; justify-content: space-between; align-items: center;">
                 <span>Music & Sound</span>
-                <button id="musicToggle" class="toggle-btn" onclick="toggleMusic()">OFF</button>
+                <button id="musicToggle" class="toggle-btn" onclick="toggleMusic()">ON</button>
             </div>
             <button class="close-btn" onclick="closeSettings()">CLOSE</button>
         </div>
@@ -84,22 +85,49 @@
     <script>
         const settingsMenu = document.getElementById('settingsMenu');
         const musicToggle = document.getElementById('musicToggle');
-        let musicOn = false;
+        
+        // Music setup
+        const bgMusic = new Audio('bgm.mp3');
+        bgMusic.loop = true;
+        let musicEnabled = true;
 
-        function openSettings() {
-            settingsMenu.style.display = 'flex';
+        // Load saved preference if any
+        if(localStorage.getItem('musicPref') === 'off') {
+            musicEnabled = false;
+            musicToggle.innerText = "OFF";
+            musicToggle.style.background = "#00d2ff";
         }
 
-        function closeSettings() {
-            settingsMenu.style.display = 'none';
+        function startExperience() {
+            if (musicEnabled) {
+                bgMusic.play().then(() => {
+                    // Once music starts, go to home page
+                    window.location.href = "home.html";
+                }).catch(e => {
+                    console.log("Audio failed", e);
+                    window.location.href = "home.html";
+                });
+            } else {
+                window.location.href = "home.html";
+            }
         }
+
+        function openSettings() { settingsMenu.style.display = 'flex'; }
+        function closeSettings() { settingsMenu.style.display = 'none'; }
         
         function toggleMusic() {
-            musicOn = !musicOn;
-            musicToggle.innerText = musicOn ? "ON" : "OFF";
-            musicToggle.style.background = musicOn ? "#4CAF50" : "#00d2ff";
+            musicEnabled = !musicEnabled;
+            musicToggle.innerText = musicEnabled ? "ON" : "OFF";
+            musicToggle.style.background = musicEnabled ? "#4CAF50" : "#00d2ff";
             
-            // Logic to play/pause music will go here once we add audio files
+            // Save preference
+            localStorage.setItem('musicPref', musicEnabled ? 'on' : 'off');
+            
+            if (musicEnabled) {
+                bgMusic.play();
+            } else {
+                bgMusic.pause();
+            }
         }
     </script>
 
