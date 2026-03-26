@@ -13,6 +13,7 @@
             justify-content: center;
             height: 100vh;
             font-family: sans-serif;
+            overflow: hidden;
         }
         .welcome-box {
             padding: 40px 60px;
@@ -24,9 +25,7 @@
             transition: 0.3s;
             text-align: center;
         }
-        .welcome-box:active {
-            transform: scale(0.9);
-        }
+        .welcome-box:active { transform: scale(0.9); }
         .welcome-box h2 {
             margin: 0;
             color: #00d2ff;
@@ -34,16 +33,75 @@
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-        p { color: #555; margin-top: 15px; position: absolute; bottom: 50px; }
+        .footer-text { color: #555; margin-top: 15px; position: absolute; bottom: 50px; }
+
+        /* Settings Style */
+        .settings-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: none; border: none; cursor: pointer; font-size: 30px;
+            z-index: 100;
+        }
+        #settingsMenu {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000;
+            align-items: center; justify-content: center; color: white;
+        }
+        .menu-content {
+            background: #222; padding: 30px; border-radius: 20px;
+            border: 2px solid #00d2ff; text-align: center; width: 250px;
+        }
+        .toggle-btn {
+            background: #00d2ff; border: none; padding: 8px 15px;
+            border-radius: 5px; font-weight: bold; cursor: pointer; min-width: 60px;
+        }
+        .close-btn {
+            background: none; border: 1px solid white; color: white; 
+            padding: 5px 15px; border-radius: 5px; cursor: pointer; margin-top: 15px;
+        }
     </style>
 </head>
 <body>
+
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
 
     <a href="home.html" class="welcome-box">
         <h2>ALL GAMES</h2>
     </a>
 
-    <p>Tap the box to start</p>
+    <p class="footer-text">Tap the box to start</p>
+
+    <div id="settingsMenu">
+        <div class="menu-content">
+            <h2 style="color:#00d2ff">SETTINGS</h2>
+            <div style="margin: 20px 0; display: flex; justify-content: space-between; align-items: center;">
+                <span>Music & Sound</span>
+                <button id="musicToggle" class="toggle-btn" onclick="toggleMusic()">OFF</button>
+            </div>
+            <button class="close-btn" onclick="closeSettings()">CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        const settingsMenu = document.getElementById('settingsMenu');
+        const musicToggle = document.getElementById('musicToggle');
+        let musicOn = false;
+
+        function openSettings() {
+            settingsMenu.style.display = 'flex';
+        }
+
+        function closeSettings() {
+            settingsMenu.style.display = 'none';
+        }
+        
+        function toggleMusic() {
+            musicOn = !musicOn;
+            musicToggle.innerText = musicOn ? "ON" : "OFF";
+            musicToggle.style.background = musicOn ? "#4CAF50" : "#00d2ff";
+            
+            // Logic to play/pause music will go here once we add audio files
+        }
+    </script>
 
 </body>
 </html>
