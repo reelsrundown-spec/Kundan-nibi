@@ -76,4 +76,32 @@
                     if (x < coinX + 8 && x + 20 > coinX - 8 && y < coinY + 8 && y + 20 > coinY - 8) {
                         coins++; score += 10; scoreDisplay.innerText = score; coinActive = false;
                     }
-                    
+                }
+                if (coinX < -20 || !coinActive) { coinX = canvas.width + 150 + Math.random() * 300; coinY = 100 + Math.random() * 50; coinActive = true; }
+
+                if (isJumping) { y += dy; dy += 0.6; if (y >= 150) { y = 150; isJumping = false; } }
+                if (x < obsX + 15 && x + 20 > obsX && y < obsY + 25 && y + 20 > obsY) gameState = OVER;
+            } else if (gameState === OVER) {
+                drawDino(x, y);
+                ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(40, 65, 240, 70);
+                ctx.fillStyle = "white"; ctx.font = "bold 25px Arial"; 
+                ctx.fillText("\u0D28\u0D40 \u0D1A\u0D24\u0D4D\u0D24\u0D41", 110, 105); 
+            }
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener("touchstart", function(e) {
+            if (e.target.tagName === 'A') return;
+            e.preventDefault();
+            if (gameState === START) gameState = PLAY;
+            else if (gameState === PLAY && !isJumping) { dy = -9.5; isJumping = true; }
+            else if (gameState === OVER) resetGame();
+        }, { passive: false });
+
+        // IMPORTANT: Start the game engine
+        resetGame(); 
+        draw(); 
+
+    </script>
+</body>
+</html>
