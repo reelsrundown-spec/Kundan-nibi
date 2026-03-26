@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dino Jump Pro</title>
     <style>
-        body { text-align: center; font-family: Arial; margin: 0; padding-top: 10px; background-color: #f0f0f0; overflow: hidden; touch-action: manipulation; -webkit-user-select: none; }
+        body { text-align: center; font-family: Arial, sans-serif; margin: 0; padding-top: 10px; background-color: #f0f0f0; overflow: hidden; touch-action: manipulation; -webkit-user-select: none; }
         .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; max-width: 320px; margin: 0 auto; }
         .back-btn { background: #2c3e50; color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 14px; display: inline-block; }
         .score-board { font-size: 18px; font-weight: bold; color: #333; }
@@ -16,7 +16,7 @@
 <body>
 
     <div class="nav-bar">
-        <a href="index.html" class="back-btn">← Back</a>
+        <a href="index.html" class="back-btn"><- Back</a>
         <div class="score-board">Score: <span id="scoreVal">0</span></div>
     </div>
     
@@ -28,9 +28,10 @@
         const ctx = canvas.getContext("2d");
         const scoreDisplay = document.getElementById("scoreVal");
 
-        // Sound Effects
+        // Audio Assets
         const jumpSound = new Audio('jump.mp3');
         const coinSound = new Audio('coin.mp3');
+        const gameOverSound = new Audio('gameover.mp3');
 
         let x, y, dy, isJumping, score, coins, obsX, obsY, obsSpeed, clouds, gameState;
         let coinX, coinY, coinActive;
@@ -78,14 +79,19 @@
                     ctx.fillStyle = "#FFD700"; ctx.beginPath(); ctx.arc(coinX, coinY, 8, 0, Math.PI * 2); ctx.fill();
                     coinX -= obsSpeed;
                     if (x < coinX + 8 && x + 20 > coinX - 8 && y < coinY + 8 && y + 20 > coinY - 8) {
-                        coinSound.play(); // Play coin sound
+                        coinSound.play();
                         coins++; score += 10; scoreDisplay.innerText = score; coinActive = false;
                     }
                 }
                 if (coinX < -20 || !coinActive) { coinX = canvas.width + 150 + Math.random() * 300; coinY = 100 + Math.random() * 50; coinActive = true; }
 
                 if (isJumping) { y += dy; dy += 0.6; if (y >= 150) { y = 150; isJumping = false; } }
-                if (x < obsX + 15 && x + 20 > obsX && y < obsY + 25 && y + 20 > obsY) gameState = OVER;
+
+                // Collision Detection with Sound
+                if (x < obsX + 15 && x + 20 > obsX && y < obsY + 25 && y + 20 > obsY) {
+                    gameOverSound.play();
+                    gameState = OVER;
+                }
             } else if (gameState === OVER) {
                 drawDino(x, y);
                 ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(40, 65, 240, 70);
@@ -102,14 +108,13 @@
             else if (gameState === PLAY && !isJumping) { 
                 dy = -9.5; 
                 isJumping = true; 
-                jumpSound.play(); // Play jump sound
+                jumpSound.play();
             }
             else if (gameState === OVER) resetGame();
         }, { passive: false });
 
         resetGame(); 
         draw(); 
-
     </script>
 </body>
 </html>
