@@ -3,20 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Survival Bat Game</title>
-    <link rel="stylesheet" href="css/bat-style.css">
+    <title>Premium Bat Survival</title>
+    <style>
+        body {
+            background: #e0e0e0; /* Light Neumorphic background */
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .score-board {
+            font-size: 20px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        /* Neumorphic Canvas Border */
+        .canvas-container {
+            padding: 15px;
+            background: #e0e0e0;
+            border-radius: 30px;
+            box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+        }
+
+        canvas {
+            background: #f5f5f5;
+            border-radius: 20px;
+            display: block;
+        }
+
+        /* Neumorphic Buttons */
+        .controls {
+            margin-top: 30px;
+            display: grid;
+            grid-template-areas: ". up ." "left . right" ". down .";
+            gap: 15px;
+        }
+
+        button {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            border: none;
+            background: #e0e0e0;
+            box-shadow: 6px 6px 12px #bebebe, -6px -6px 12px #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            outline: none;
+        }
+
+        button:active {
+            box-shadow: inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff;
+            transform: scale(0.95);
+        }
+
+        .up { grid-area: up; }
+        .left { grid-area: left; }
+        .right { grid-area: right; }
+        .down { grid-area: down; }
+
+    </style>
 </head>
 <body>
-    <div class="header">Score: <span id="scoreVal">0</span></div>
-    <canvas id="gameCanvas"></canvas>
-    
+
+    <div class="score-board">Score: <span id="scoreVal">0</span></div>
+
+    <div class="canvas-container">
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
     <div class="controls">
-        <div class="row"><button onclick="changeDir('UP')">UP</button></div>
-        <div class="row">
-            <button onclick="changeDir('LEFT')">LEFT</button>
-            <button onclick="changeDir('RIGHT')">RIGHT</button>
-        </div>
-        <div class="row"><button onclick="changeDir('DOWN')">DOWN</button></div>
+        <button class="up" onclick="changeDir('UP')">▲</button>
+        <button class="left" onclick="changeDir('LEFT')">◀</button>
+        <button class="right" onclick="changeDir('RIGHT')">▶</button>
+        <button class="down" onclick="changeDir('DOWN')">▼</button>
     </div>
 
     <script src="js/bat-logic.js"></script>
