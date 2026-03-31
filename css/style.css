@@ -1,0 +1,76 @@
+:root {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --primary: #6200ee;
+    --text: #ffffff;
+    --x-color: #ff4d4d;
+    --o-color: #4d94ff;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.menu, .game-area {
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.hidden { display: none; }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.cell {
+    aspect-ratio: 1/1;
+    background: var(--card);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.cell:active { transform: scale(0.95); }
+.cell.x { color: var(--x-color); }
+.cell.o { color: var(--o-color); }
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.back-btn { background: #333; margin-top: 20px; }
+
+#status {
+    font-size: 1.3rem;
+    margin: 15px;
+    color: #ffeb3b;
+    height: 30px;
+}
+
