@@ -14,73 +14,68 @@ const db = firebase.database().ref("tictactoe/global");
 let board = ["", "", "", "", "", "", "", "", ""];
 let currentPlayer = "X";
 let gameActive = true;
-let gameMode = "";
-let aiLevel = "normal";
+let mode = "";
+let difficulty = "normal";
 
 function showScreen(id) {
     document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
 }
 
-function initAI(level) {
-    aiLevel = level;
-    gameMode = "ai";
-    startGame();
-}
-
-function initLocal() {
-    gameMode = "local";
-    startGame();
+function initGame(m, diff = 'normal') {
+    mode = m;
+    difficulty = diff;
+    resetGame();
+    showScreen('game-play');
 }
 
 function startOnline() {
-    gameMode = "online";
-    startGame();
+    mode = "online";
+    resetGame();
+    showScreen('game-play');
     db.on("value", (snap) => {
         const data = snap.val();
         if (data) {
             board = data.board;
             currentPlayer = data.turn;
-            renderBoard();
+            updateUI();
         }
     });
-}
-
-function startGame() {
-    board = ["", "", "", "", "", "", "", "", ""];
-    currentPlayer = "X";
-    gameActive = true;
-    showScreen('game-play');
-    renderBoard();
 }
 
 function cellClicked(index) {
     if (board[index] !== "" || !gameActive) return;
 
     board[index] = currentPlayer;
-    renderBoard();
+    updateUI();
 
     if (checkWinner()) {
-        document.getElementById('status-text').innerText = "Player " + currentPlayer + " Wins!";
+        document.getElementById('status-text').innerText = "Winner: " + currentPlayer;
         gameActive = false;
         return;
     }
 
     currentPlayer = currentPlayer === "X" ? "O" : "X";
-    document.getElementById('status-text').innerText = "Player " + currentPlayer + "'s Turn";
+    document.getElementById('status-text').innerText = "Turn: " + currentPlayer;
 
-    if (gameMode === "ai" && currentPlayer === "O") {
-        setTimeout(aiMove, 500);
-    } else if (gameMode === "online") {
+    if (mode === "ai" && currentPlayer === "O" && gameActive) {
+        setTimeout(computerMove, 500);
+    } else if (mode === "online") {
         db.set({ board: board, turn: currentPlayer });
     }
 }
 
-function renderBoard() {
+function updateUI() {
     const cells = document.querySelectorAll('.cell');
     board.forEach((val, i) => {
         cells[i].innerText = val;
     });
+}
+
+function computerMove() {
+    let available = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+    let move = available[Math.floor(Math.random() * available.length)];
+    if (move !== undefined) cellClicked(move);
 }
 
 function checkWinner() {
@@ -88,10 +83,11 @@ function checkWinner() {
     return wins.some(p => board[p[0]] && board[p[0]] === board[p[1]] && board[p[0]] === board[p[2]]);
 }
 
-function aiMove() {
-    let move = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-    let randomMove = move[Math.floor(Math.random() * move.length)];
-    if (randomMove !== undefined) cellClicked(randomMove);
+function resetGame() {
+    board = ["", "", "", "", "", "", "", "", ""];
+    currentPlayer = "X";
+    gameActive = true;
+    document.getElementById('status-text').innerText = "Turn: X";
+    updateUI();
+    if(mode === "online") db.set({board, turn: "X"});
 }
-
-function resetGame() { startGame(); }
