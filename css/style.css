@@ -16,6 +16,11 @@ body {
     margin: 0;
 }
 
+/* This is the most important part to hide pages */
+.hidden {
+    display: none !important;
+}
+
 .container {
     background: var(--card);
     padding: 2rem;
@@ -25,8 +30,6 @@ body {
     max-width: 350px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
-
-.hidden { display: none; }
 
 h1, h2 { color: var(--accent); margin-bottom: 1.5rem; }
 
