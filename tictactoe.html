@@ -1,49 +1,55 @@
 <!DOCTYPE html>
-<html lang="ml">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe Pro</title>
+    <title>Tic Tac Toe Multiplayer</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database-compat.js"></script>
 </head>
 <body>
 
-    <div id="main-menu" class="menu">
+    <div id="main-menu" class="container">
         <h1>Tic Tac Toe</h1>
-        <button onclick="startMode('local')">Local Multiplayer</button>
-        <button onclick="startMode('ai')">Play with Computer</button>
-        <button onclick="startMode('online')">Online Multiplayer</button>
-        <button class="back-btn" onclick="window.location.href='index.html'">Main Menu</button>
+        <button class="btn" onclick="showScreen('ai-screen')">Play with Computer</button>
+        <button class="btn" onclick="showScreen('local-setup')">Local Multiplayer</button>
+        <button class="btn" onclick="startOnline()">Online Multiplayer</button>
+        <button class="btn back-btn" onclick="window.location.href='home.html'">Main Menu</button>
     </div>
 
-    <div id="ai-menu" class="menu hidden">
+    <div id="ai-screen" class="container hidden">
         <h2>Select Difficulty</h2>
-        <button onclick="setDifficulty('easy')">Easy</button>
-        <button onclick="setDifficulty('normal')">Normal</button>
-        <button onclick="setDifficulty('hard')">Hard</button>
-        <button class="back-btn" onclick="showMenu('main-menu')">Back</button>
+        <button class="btn" onclick="initAI('easy')">Easy</button>
+        <button class="btn" onclick="initAI('normal')">Normal</button>
+        <button class="btn" onclick="initAI('hard')">Hard</button>
+        <button class="btn back-btn" onclick="showScreen('main-menu')">Back</button>
     </div>
 
-    <div id="game-screen" class="game-area hidden">
-        <div id="status">Player X's Turn</div>
-        <div class="grid" id="board">
-            <div class="cell" onclick="handleMove(0)"></div>
-            <div class="cell" onclick="handleMove(1)"></div>
-            <div class="cell" onclick="handleMove(2)"></div>
-            <div class="cell" onclick="handleMove(3)"></div>
-            <div class="cell" onclick="handleMove(4)"></div>
-            <div class="cell" onclick="handleMove(5)"></div>
-            <div class="cell" onclick="handleMove(6)"></div>
-            <div class="cell" onclick="handleMove(7)"></div>
-            <div class="cell" onclick="handleMove(8)"></div>
+    <div id="local-setup" class="container hidden">
+        <h2>Local Game</h2>
+        <p>Two players on one device</p>
+        <button class="btn" onclick="initLocal()">Start Game</button>
+        <button class="btn back-btn" onclick="showScreen('main-menu')">Back</button>
+    </div>
+
+    <div id="game-play" class="container hidden">
+        <div id="status-text">Player X's Turn</div>
+        <div class="board" id="board">
+            <div class="cell" onclick="cellClicked(0)"></div>
+            <div class="cell" onclick="cellClicked(1)"></div>
+            <div class="cell" onclick="cellClicked(2)"></div>
+            <div class="cell" onclick="cellClicked(3)"></div>
+            <div class="cell" onclick="cellClicked(4)"></div>
+            <div class="cell" onclick="cellClicked(5)"></div>
+            <div class="cell" onclick="cellClicked(6)"></div>
+            <div class="cell" onclick="cellClicked(7)"></div>
+            <div class="cell" onclick="cellClicked(8)"></div>
         </div>
-        <button onclick="resetGame()">Restart Game</button>
-        <button class="back-btn" onclick="location.reload()">Back to Menu</button>
+        <button class="btn" onclick="resetGame()">Restart</button>
+        <button class="btn back-btn" onclick="location.reload()">Quit Game</button>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
