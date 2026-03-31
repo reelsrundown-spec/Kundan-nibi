@@ -2,17 +2,77 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Game Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Game Hub - List View</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; }
-        h1 { color: #00d2ff; margin-top: 50px; text-transform: uppercase; }
-        p { color: #aaa; margin-bottom: 30px; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 500px; margin: auto; }
-        .card { background: #1e1e1e; padding: 25px; border-radius: 20px; text-decoration: none; color: white; transition: 0.3s; border: 1px solid #333; }
-        .card:active { transform: scale(0.95); background: #333; }
-        .icon { font-size: 50px; margin-bottom: 10px; }
-        .title { font-weight: bold; }
+        body { 
+            font-family: sans-serif; 
+            background: #121212; 
+            color: white; 
+            text-align: center; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        
+        h1 { 
+            color: #00d2ff; 
+            margin-top: 30px; 
+            text-transform: uppercase; 
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+        
+        p { color: #888; margin-bottom: 30px; font-size: 14px; }
+
+        /* List Container */
+        .game-list { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            max-width: 450px; 
+            margin: auto; 
+        }
+
+        /* List Item Design */
+        .game-card { 
+            background: #1e1e1e; 
+            padding: 12px 20px; 
+            border-radius: 15px; 
+            text-decoration: none; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            transition: 0.3s; 
+            border: 1px solid #333; 
+        }
+
+        /* Active/Touch effect */
+        .game-card:active { 
+            transform: scale(0.96); 
+            background: #252525; 
+            border-color: #00d2ff;
+        }
+
+        .icon { 
+            font-size: 32px; 
+            margin-right: 20px; 
+            background: #2a2a2a;
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .title { 
+            font-size: 18px; 
+            font-weight: bold; 
+            flex-grow: 1; 
+            text-align: left;
+        }
+
+        .arrow { color: #444; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -20,34 +80,56 @@
     <h1>MY GAME HUB</h1>
     <p>Select a Game to Play</p>
 
-        <div class="grid">
-        <a href="dino.html" class="card"><div class="icon">🦖</div><div class="title">Dino Jump</div></a>
-        <a href="snake.html" class="card"><div class="icon">🐍</div><div class="title">Snake</div></a>
-        <a href="bingo.html" class="card"><div class="icon">🔢</div><div class="title">Bingo</div></a>
-        <a href="chain.html" class="card"><div class="icon">⚛️</div><div class="title">Chain Reaction</div></a>
-        <a href="brick.html" class="card"><div class="icon">🎾</div><div class="title">Brick Ball</div></a>
-        <a href="doodle.html" class="card"><div class="icon">🚀</div><div class="title">Doodle Jump</div></a>
-        
-        <a href="bat-game.html" class="card" style="border: 1px solid #a29bfe;">
+    <div class="game-list">
+        <a href="bat-game.html" class="game-card" style="border-color: #a29bfe;">
             <div class="icon">🦇</div>
             <div class="title">Survival Bat</div>
+            <div class="arrow">➔</div>
         </a>
-        </div>
-    
+
+        <a href="snake.html" class="game-card">
+            <div class="icon">🐍</div>
+            <div class="title">Snake</div>
+            <div class="arrow">➔</div>
+        </a>
+
+        <a href="dino.html" class="game-card">
+            <div class="icon">🦖</div>
+            <div class="title">Dino Jump</div>
+            <div class="arrow">➔</div>
+        </a>
+
+        <a href="brick.html" class="game-card">
+            <div class="icon">🎾</div>
+            <div class="title">Brick Ball</div>
+            <div class="arrow">➔</div>
+        </a>
+
+        <a href="bingo.html" class="game-card">
+            <div class="icon">🔢</div>
+            <div class="title">Bingo</div>
+            <div class="arrow">➔</div>
+        </a>
+
+        <a href="doodle.html" class="game-card">
+            <div class="icon">🚀</div>
+            <div class="title">Doodle Jump</div>
+            <div class="arrow">➔</div>
+        </a>
+
+        <a href="chain.html" class="game-card">
+            <div class="icon">⚛️</div>
+            <div class="title">Chain Reaction</div>
+            <div class="arrow">➔</div>
+        </a>
+    </div>
 
     <script>
-        // Music setup
-        const bgMusic = new Audio('bgm.mp3');
-        bgMusic.loop = true;
-
-        // Try to play music automatically
+        // Music setup for home page
         if (localStorage.getItem('musicPref') !== 'off') {
-            bgMusic.play().catch(e => {
-                console.log("Autoplay blocked. Tap anywhere to play.");
-                document.addEventListener('click', () => {
-                    bgMusic.play();
-                }, { once: true });
-            });
+            const bgMusic = new Audio('bgm.mp3');
+            bgMusic.loop = true;
+            bgMusic.play().catch(e => console.log("Waiting for user interaction"));
         }
     </script>
 </body>
