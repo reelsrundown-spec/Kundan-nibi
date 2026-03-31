@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Survival Bat Game</title>
+    <link rel="stylesheet" href="css/bat-style.css">
+</head>
+<body>
+    <div class="header">Score: <span id="scoreVal">0</span></div>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="controls">
+        <div class="row"><button onclick="changeDir('UP')">UP</button></div>
+        <div class="row">
+            <button onclick="changeDir('LEFT')">LEFT</button>
+            <button onclick="changeDir('RIGHT')">RIGHT</button>
+        </div>
+        <div class="row"><button onclick="changeDir('DOWN')">DOWN</button></div>
+    </div>
+
+    <script src="js/bat-logic.js"></script>
+</body>
+</html>
