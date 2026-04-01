@@ -36,5 +36,128 @@
 
     <div id="status">CONNECTING TO SERVER...</div>
 
+    <div class="board" id="board">
+        <div class="cell" onclick="makeMove(0)" id="c0"></div>
+        <div class="cell" onclick="makeMove(1)" id="c1"></div>
+        <div class="cell" onclick="makeMove(2)" id="c2"></div>
+        <div class="cell" onclick="makeMove(3)" id="c3"></div>
+        <div class="cell" onclick="makeMove(4)" id="c4"></div>
+        <div class="cell" onclick="makeMove(5)" id="c5"></div>
+        <div class="cell" onclick="makeMove(6)" id="c6"></div>
+        <div class="cell" onclick="makeMove(7)" id="c7"></div>
+        <div class="cell" onclick="makeMove(8)" id="c8"></div>
+    </div>
 
-  
+    <button class="restart-btn" onclick="requestRestart()">RESTART MATCH</button>
+    
+    <div id="room-display">ROOM ID: NONE</div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.11.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAC0Ancjw96eamzv0Ja7vMvpETleysfcqQ",
+            authDomain: "multiplayer-bingo-e27fd.firebaseapp.com",
+            databaseURL: "https://multiplayer-bingo-e27fd-default-rtdb.firebaseio.com",
+            projectId: "multiplayer-bingo-e27fd",
+            storageBucket: "multiplayer-bingo-e27fd.appspot.com",
+            messagingSenderId: "768320492362",
+            appId: "1:768320492362:web:ad711f314c523c5a4167b3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomCode = urlParams.get('room') || 'public_lobby';
+        const gameRef = database.ref('ttt_online/' + roomCode);
+
+        let board = Array(9).fill("");
+        let mySymbol = null; 
+        let currentPlayer = "X";
+        let gameActive = true;
+
+        document.getElementById('room-display').innerText = "ROOM ID: " + roomCode.toUpperCase();
+
+        // 1. Assign Player Role
+        gameRef.once('value', (snap) => {
+            const data = snap.val();
+            if (!data || !data.p1) {
+                mySymbol = "X";
+                gameRef.update({ p1: true, board: Array(9).fill(""), turn: "X", active: true });
+            } else if (!data.p2) {
+                mySymbol = "O";
+                gameRef.update({ p2: true });
+            } else {
+                mySymbol = "VIEWER";
+            }
+            document.getElementById('player-type').innerText = "ROLE: PLAYER " + mySymbol;
+        });
+
+        // 2. Real-time Sync
+        gameRef.on('value', (snap) => {
+            const data = snap.val();
+            if (data) {
+                board = data.board || Array(9).fill("");
+                currentPlayer = data.turn || "X";
+                gameActive = (data.active !== undefined) ? data.active : true;
+                updateUI();
+                
+                if (gameActive) {
+                    if (currentPlayer === mySymbol) {
+                        document.getElementById('status').innerText = "YOUR TURN (" + mySymbol + ")";
+                        document.getElementById('status').style.color = "#00d2ff";
+                    } else {
+                        document.getElementById('status').innerText = "WAITING FOR OPPONENT...";
+                        document.getElementById('status').style.color = "#555";
+                    }
+                } else {
+                    checkFinalResult();
+                }
+            }
+        });
+
+        function makeMove(i) {
+            // Strict Turn Validation
+            if (board[i] === "" && gameActive && currentPlayer === mySymbol) {
+                board[i] = mySymbol;
+                const nextTurn = (mySymbol === "X") ? "O" : "X";
+                gameRef.update({ board: board, turn: nextTurn });
+            }
+        }
+
+        function updateUI() {
+            board.forEach((val, i) => {
+                const c = document.getElementById('c' + i);
+                c.innerText = val;
+                c.className = 'cell ' + val.toLowerCase();
+            });
+        }
+
+        function checkFinalResult() {
+            const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            let hasWinner = false;
+            for (let c of wins) {
+                if (board[c[0]] && board[c[0]] === board[c[1]] && board[c[0]] === board[c[2]]) {
+                    const winner = board[c[0]];
+                    document.getElementById('status').innerText = (winner === mySymbol ? "YOU WON! 🏆" : "PLAYER " + winner + " WON!");
+                    document.getElementById('status').style.color = "#ffce00";
+                    c.forEach(idx => document.getElementById('c' + idx).classList.add('winner'));
+                    hasWinner = true;
+                    break;
+                }
+            }
+            if (!hasWinner && !board.includes("")) {
+                document.getElementById('status').innerText = "IT'S A DRAW! 🤝";
+                document.getElementById('status').style.color = "#ffffff";
+            }
+        }
+
+        function requestRestart() {
+            gameRef.update({ board: Array(9).fill(""), turn: "X", active: true });
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('winner'));
+        }
+    </script>
+</body>
+</html>
