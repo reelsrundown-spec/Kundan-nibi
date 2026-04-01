@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe - Menu</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; height: 100vh; justify-content: center; }
-        .nav-bar { position: absolute; top: 20px; left: 20px; }
-        .back-btn { background: #2c3e50; color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 14px; }
-        
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; display: flex; flex-direction: column; height: 100vh; justify-content: center; }
         h1 { color: #00d2ff; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px; }
         
         .menu-grid { display: flex; flex-direction: column; gap: 15px; max-width: 320px; margin: 0 auto; width: 100%; }
@@ -23,46 +20,42 @@
         .info h3 { margin: 0; font-size: 16px; color: #fff; }
         .info p { margin: 5px 0 0; font-size: 12px; color: #888; }
 
-        /* Modal for Room Code */
+        /* Room Code Modal */
         #roomModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center;
         }
-        .modal-content { background: #1e1e1e; padding: 30px; border-radius: 20px; border: 1px solid #00d2ff; width: 80%; max-width: 300px; }
+        .modal-content { background: #1e1e1e; padding: 30px; border-radius: 20px; border: 1px solid #00d2ff; width: 85%; max-width: 300px; }
         input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 8px; border: 1px solid #444; background: #121212; color: white; text-align: center; font-size: 18px; box-sizing: border-box; }
         .go-btn { background: #00d2ff; color: #121212; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="nav-bar">
-        <a href="home.html" class="back-btn">← Back</a>
-    </div>
-
     <h1>Tic Tac Toe</h1>
 
     <div class="menu-grid">
-        <div class="menu-card" onclick="goToGame('ai')">
+        <div class="menu-card" onclick="location.href='tictactoe/computer.html'">
             <div class="icon">🤖</div>
             <div class="info">
                 <h3>Play with Computer</h3>
-                <p>Challenge the Smart Bot</p>
+                <p>Easy, Normal & Hard Modes</p>
+            </div>
+        </div>
+
+        <div class="menu-card" onclick="location.href='tictactoe/local.html'">
+            <div class="icon">👥</div>
+            <div class="info">
+                <h3>Play with Friends</h3>
+                <p>Pass and Play (Offline)</p>
             </div>
         </div>
 
         <div class="menu-card" onclick="showModal()">
-            <div class="icon">👥</div>
-            <div class="info">
-                <h3>Play with Friends</h3>
-                <p>Create or Join Private Room</p>
-            </div>
-        </div>
-
-        <div class="menu-card" onclick="goToGame('public')">
             <div class="icon">🌐</div>
             <div class="info">
                 <h3>Play Online</h3>
-                <p>Match with Global Players</p>
+                <p>Private Room (Firebase)</p>
             </div>
         </div>
     </div>
@@ -71,28 +64,23 @@
         <div class="modal-content">
             <h3 style="margin:0;">Enter Room Code</h3>
             <input type="number" id="roomCode" placeholder="Ex: 1234">
-            <button class="go-btn" onclick="joinRoom()">START GAME</button>
+            <button class="go-btn" onclick="joinOnline()">JOIN ROOM</button>
             <p onclick="hideModal()" style="margin-top:15px; font-size:12px; color:#ff4d4d; cursor:pointer;">Cancel</p>
         </div>
     </div>
 
     <script>
-        function goToGame(mode) {
-            window.location.href = `tictactoe.html?mode=${mode}`;
-        }
-
         function showModal() { document.getElementById('roomModal').style.display = 'flex'; }
         function hideModal() { document.getElementById('roomModal').style.display = 'none'; }
 
-        function joinRoom() {
+        function joinOnline() {
             const code = document.getElementById('roomCode').value;
             if (code) {
-                window.location.href = `tictactoe.html?mode=friend&room=${code}`;
+                location.href = `tictactoe/online.html?room=${code}`;
             } else {
-                alert("Please enter a code!");
+                alert("Please enter a room code!");
             }
         }
     </script>
 </body>
 </html>
-
