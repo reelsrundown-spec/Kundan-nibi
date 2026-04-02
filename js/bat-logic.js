@@ -1,141 +1,119 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const scoreElement = document.getElementById("scoreVal");
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreVal = document.getElementById('scoreVal');
+const msg = document.getElementById('msg');
+const stick = document.getElementById('joystick-stick');
+const base = document.getElementById('joystick-base');
 
-canvas.width = 320; 
-canvas.height = 380;
+canvas.width = 300;
+canvas.height = 400;
 
-let batSize = 1.5; 
-let batX = canvas.width / 2;
-let batY = canvas.height / 2;
-let speed = 4;
-let frame = 0;
-let isGameOver = false;
-
-let food = {
-    x: Math.random() * (canvas.width - 40) + 20,
-    y: Math.random() * (canvas.height - 40) + 20
-};
-
-let stones = [];
 let score = 0;
-let foodCounter = 0;
-let direction = "STATIONARY";
+let gameActive = true;
+let bat = { x: 130, y: 330, w: 40, h: 40 };
+let obstacles = [];
+let speed = 4;
+let velocity = { x: 0, y: 0 };
 
-function changeDir(d) {
-    if(!isGameOver) direction = d;
+// Joystick Logic
+let stickX = 0;
+let stickY = 0;
+const maxRadius = 40;
+
+base.addEventListener('touchstart', handleJoystick);
+base.addEventListener('touchmove', handleJoystick);
+base.addEventListener('touchend', () => {
+    stick.style.transform = `translate(0px, 0px)`;
+    velocity.x = 0;
+    velocity.y = 0;
+});
+
+function handleJoystick(e) {
+    if (!gameActive) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = base.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    let dx = touch.clientX - centerX;
+    let dy = touch.clientY - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > maxRadius) {
+        dx *= maxRadius / distance;
+        dy *= maxRadius / distance;
+    }
+
+    stick.style.transform = `translate(${dx}px, ${dy}px)`;
+
+    // Calculate velocity based on stick position
+    velocity.x = (dx / maxRadius) * speed;
+    velocity.y = (dy / maxRadius) * speed;
 }
 
-function drawPixelBat(x, y, scale) {
-    ctx.fillStyle = "#333";
-    frame++;
-    let wingPos = Math.sin(frame * 0.2) > 0 ? 0 : 2;
-    ctx.fillRect(x - (2 * scale), y, 4 * scale, 4 * scale);
-    ctx.fillRect(x - (8 * scale), y - (wingPos * scale), 6 * scale, 2 * scale);
-    ctx.fillRect(x + (2 * scale), y - (wingPos * scale), 6 * scale, 2 * scale);
-    ctx.fillRect(x - (2 * scale), y - (2 * scale), scale, scale);
-    ctx.fillRect(x + (scale), y - (2 * scale), scale, scale);
-    ctx.fillStyle = "white";
-    ctx.fillRect(x - scale, y + scale, scale, scale);
-    ctx.fillRect(x + scale, y + scale, scale, scale);
-}
-
+// Game Loop
 function update() {
-    if(isGameOver) return;
+    if (!gameActive) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.font = "20px serif";
-    ctx.fillText("🦟", food.x, food.y);
+    // Update Bat Position
+    bat.x += velocity.x;
+    bat.y += velocity.y;
 
-    for (let i = 0; i < stones.length; i++) {
-        ctx.fillText("🌑", stones[i].x, stones[i].y);
-        stones[i].y += 3;
-        let dist = Math.hypot(stones[i].x - batX, stones[i].y - batY);
-        if (dist < (batSize * 10)) {
+    // Keep Bat inside Canvas
+    if (bat.x < 0) bat.x = 0;
+    if (bat.y < 0) bat.y = 0;
+    if (bat.x > canvas.width - bat.w) bat.x = canvas.width - bat.w;
+    if (bat.y > canvas.height - bat.h) bat.y = canvas.height - bat.h;
+
+    // Obstacle Logic
+    if (Math.random() < 0.03) {
+        obstacles.push({ x: Math.random() * (canvas.width - 30), y: -30, w: 30, h: 30 });
+    }
+
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        let o = obstacles[i];
+        o.y += 3;
+
+        // Collision
+        if (bat.x < o.x + o.w && bat.x + bat.w > o.x && bat.y < o.y + o.h && bat.y + bat.h > o.y) {
             endGame();
         }
-    }
 
-    if (direction === "UP") batY -= speed;
-    if (direction === "DOWN") batY += speed;
-    if (direction === "LEFT") batX -= speed;
-    if (direction === "RIGHT") batX += speed;
+        ctx.fillStyle = '#ff4757';
+        ctx.fillRect(o.x, o.y, o.w, o.h);
 
-    if (batX < 0) batX = canvas.width;
-    if (batX > canvas.width) batX = 0;
-    if (batY < 0) batY = canvas.height;
-    if (batY > canvas.height) batY = 0;
-
-    drawPixelBat(batX, batY, batSize);
-
-    let distToFood = Math.hypot(batX - food.x, batY - food.y);
-    if (distToFood < (batSize * 10) + 10) {
-        score++;
-        foodCounter++;
-        scoreElement.innerHTML = score;
-        batSize += 0.2; 
-        food = {
-            x: Math.random() * (canvas.width - 40) + 20,
-            y: Math.random() * (canvas.height - 40) + 20
-        };
-        if (foodCounter % 5 === 0) {
-            stones.push({ x: Math.random() * canvas.width, y: 0 });
+        if (o.y > canvas.height) {
+            obstacles.splice(i, 1);
+            score++;
+            scoreVal.innerText = score;
         }
     }
+
+    // Draw Bat
+    ctx.fillStyle = '#2f3542';
+    ctx.fillRect(bat.x, bat.y, bat.w, bat.h);
 
     requestAnimationFrame(update);
 }
 
 function endGame() {
-    isGameOver = true;
-    
-    // Dim background
-    ctx.fillStyle = "rgba(0,0,0,0.8)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Game Over Text
-    ctx.fillStyle = "#ff7675";
-    ctx.font = "bold 30px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2 - 40);
-    
-    // Score Text
-    ctx.fillStyle = "white";
-    ctx.font = "20px sans-serif";
-    ctx.fillText("Score: " + score, canvas.width/2, canvas.height/2);
-
-    // Restart and Home Buttons
-    drawButton("RESTART", canvas.width/2, canvas.height/2 + 50, "#00cec9");
-    drawButton("HOME", canvas.width/2, canvas.height/2 + 100, "#a29bfe");
-
-    canvas.addEventListener("click", handleGameOverClick);
+    gameActive = false;
+    msg.style.display = 'block';
+    setTimeout(resetGame, 3000);
 }
 
-function drawButton(text, x, y, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x - 60, y - 15, 120, 30);
-    ctx.fillStyle = "black";
-    ctx.font = "bold 14px sans-serif";
-    ctx.fillText(text, x, y + 5);
-}
-
-function handleGameOverClick(event) {
-    const rect = canvas.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const clickY = event.clientY - rect.top;
-
-    // Check Restart Button (y+50)
-    if (clickX > canvas.width/2 - 60 && clickX < canvas.width/2 + 60 &&
-        clickY > canvas.height/2 + 35 && clickY < canvas.height/2 + 65) {
-        location.reload();
-    }
-    
-    // Check Home Button (y+100)
-    if (clickX > canvas.width/2 - 60 && clickX < canvas.width/2 + 60 &&
-        clickY > canvas.height/2 + 85 && clickY < canvas.height/2 + 115) {
-        window.location.href = "home.html";
-    }
+function resetGame() {
+    score = 0;
+    obstacles = [];
+    velocity = { x: 0, y: 0 };
+    bat = { x: 130, y: 330, w: 40, h: 40 };
+    scoreVal.innerText = '0';
+    msg.style.display = 'none';
+    gameActive = true;
+    update();
 }
 
 update();
