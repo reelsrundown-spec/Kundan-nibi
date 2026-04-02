@@ -6,89 +6,73 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     
-    <title>Bat Survival - Joystick Edition</title>
+    <title>Bat Survival</title>
     <style>
-        body {
-            background: #e0e0e0;
-            font-family: 'Segoe UI', sans-serif;
+        body { 
+            background: #121212; 
+            color: white; 
+            text-align: center; 
+            font-family: sans-serif; 
+            margin: 0; 
+            overflow: hidden; 
+            touch-action: none;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
-            touch-action: none;
-            overflow: hidden;
+        }
+        .header { font-size: 24px; padding: 10px; color: #a29bfe; font-weight: bold; }
+        
+        canvas { 
+            background: #000; 
+            border: 2px solid #444; 
+            display: block; 
+            border-radius: 10px;
         }
 
-        .score-board {
-            font-size: 28px;
-            font-weight: bold;
-            color: #444;
-            margin: 10px 0;
-        }
-
-        .canvas-container {
-            padding: 10px;
-            background: #e0e0e0;
-            border-radius: 25px;
-            box-shadow: 15px 15px 40px #bebebe, -15px -15px 40px #ffffff;
-        }
-
-        canvas {
-            background: #f5f5f5;
-            border-radius: 15px;
-            display: block;
-        }
-
-        /* Joystick Styles */
-        .joystick-container {
+        /* Joystick Style - Matching your old buttons color */
+        .joystick-base {
             margin-top: 30px;
-            width: 120px;
-            height: 120px;
-            background: #e0e0e0;
+            width: 100px;
+            height: 100px;
+            background: #2d3436;
             border-radius: 50%;
             position: relative;
-            box-shadow: 8px 8px 16px #bebebe, -8px -8px 16px #ffffff;
+            border: 2px solid #636e72;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         #joystick-stick {
-            width: 50px;
-            height: 50px;
-            background: #00d2ff;
+            width: 45px;
+            height: 45px;
+            background: #00cec9;
             border-radius: 50%;
             position: absolute;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
-            cursor: pointer;
             transition: transform 0.1s ease-out;
         }
 
-        #msg {
+        #status-msg {
             position: absolute;
-            top: 15%;
+            top: 20%;
+            color: #ff7675;
             font-weight: bold;
-            color: #ff4757;
-            font-size: 22px;
             display: none;
-            z-index: 10;
         }
     </style>
 </head>
 <body>
 
-    <div id="msg">GAME OVER! RESTARTING...</div>
-    <div class="score-board">Score: <span id="scoreVal">0</span></div>
+    <div class="header">Score: <span id="scoreVal">0</span></div>
+    <div id="status-msg">GAME OVER - RESTARTING...</div>
 
-    <div class="canvas-container">
-        <canvas id="gameCanvas"></canvas>
-    </div>
+    <canvas id="gameCanvas"></canvas>
 
-    <div class="joystick-container" id="joystick-base">
+    <div class="joystick-base" id="joyBase">
         <div id="joystick-stick"></div>
     </div>
 
